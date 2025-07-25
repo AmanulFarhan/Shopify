@@ -1,0 +1,27 @@
+<%- include("../partials/head") %>
+
+<section>
+  <div class="container mt-4">
+    <h1 class="text-center mb-4 fw-bold">🛒 Ordered Products</h1>
+
+    <div class="row justify-content-center">
+      <% if (products.length === 0) { %>
+        <div class="text-center text-muted fs-5">No products found in this order.</div>
+      <% } else { %>
+        <% products.forEach(item => { %>
+          <div class="col-md-3 col-sm-6 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img src="<%= item.productId.image.url %>" class="card-img-top" style="height: 250px; object-fit: contain;" alt="Product Image" />
+              <div class="card-body text-center">
+                <h5 class="card-title mb-2"><%= item.productId.name %></h5>
+                <p class="card-text fw-bold">Rs. <%= item.productId.price %></p>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include("../partials/footer") %>

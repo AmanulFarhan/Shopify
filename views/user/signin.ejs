@@ -1,0 +1,39 @@
+<%- include("../partials/head.ejs") %>
+
+<div class="container pt-4">
+    <h1 class="text-center">Sign-In</h1>
+    <% if (locals.error) { %>
+        
+        <div class="alert alert-danger" role="alert">
+            <%= error %>
+        </div>
+        
+    <% } %>
+    <form action="/user/signin" method="post">
+       
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" id="email">
+            
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" id="password"/>
+            
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+</div>
+
+
+
+<script>
+  // If URL contains ?error=..., remove it
+  if (window.location.search.includes("error=")) {
+    const url = new URL(window.location);         // Get full URL
+    url.searchParams.delete("error");             // Remove 'error' param
+    window.history.replaceState({}, "", url);     // Update browser URL (no reload)
+  }
+</script>
+<%- include("../partials/footer.ejs") %>

@@ -1,0 +1,77 @@
+<%- include("../partials/head.ejs") %>
+
+<section>
+    <div class="container mt-4">
+        <h1 class="text-center fw-bold text-primary mb-4">🛒 Your Cart</h1>
+
+        <% if (items.length === 0) { %>
+            <div class="text-center text-muted my-5">
+                <h4>Your cart is empty 🛒</h4>
+                <a href="/" class="btn btn-outline-primary mt-3">Browse Products</a>
+            </div>
+        <% } else { %>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center shadow-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Item</th>
+                        <th>Title</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let total = 0;
+                    items.forEach(item => {
+                        total += item.product.price * item.quantity;
+                    %>
+                    <tr>
+                        <td>
+                            <img src="<%= item.product.image.url %>" width="50" height="50" alt="<%= item.product.name %>" />
+                        </td>
+                        <td><%= item.product.name %></td>
+                        <td>
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                <button class="btn btn-outline-primary btn-sm rounded-circle"
+                                        onclick="decrementCount('<%= item.product._id %>', '<%= item.quantity %>', '<%= item.product.price %>', this, removeCartItem)">
+                                    -
+                                </button>
+                                <span id="proCount-<%= item.product._id %>" class="mx-1"><%= item.quantity %></span>
+                                <button class="btn btn-outline-primary btn-sm rounded-circle"
+                                        onclick="incrementCount('<%= item.product._id %>', '<%= item.product.price %>')">
+                                    +
+                                </button>
+                            </div>
+                        </td>
+                        <td>₹<%= item.product.price %></td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" title="Remove"
+                                    onclick="removeCartItem('<%= item.product._id %>', '<%= item.product.price %>', '<%= item.quantity %>', this)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card shadow-sm float-end mt-4" style="width: 18rem;">
+            <div class="card-body text-center">
+                <h5 class="card-title">🧾 Order Summary</h5>
+                <h4>Total: ₹<span id="total"><%= total %></span></h4>
+                <a href="/user/cart/place-order"
+                   class="btn btn-success mt-3 <%= total === 0 ? 'disabled' : '' %>">
+                   Place Order
+                </a>
+            </div>
+        </div>
+
+        <% } %>
+    </div>
+</section>
+
+
+<%- include("../partials/footer.ejs") %>

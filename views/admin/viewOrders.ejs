@@ -1,0 +1,63 @@
+<%- include("../partials/head.ejs") %>
+
+<section class="py-4 bg-light min-vh-100">
+  <div class="container">
+    <!-- Header -->
+    <div class="text-center mb-4">
+      <h3 class="fw-bold text-dark">Customer Orders</h3>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-responsive shadow-sm bg-white rounded p-3">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Address</th>
+            <th>Pincode</th>
+            <th>Mobile</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% placedOrders.forEach((order, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= order.deliveryDetails.address %></td>
+            <td><%= order.deliveryDetails.pincode %></td>
+            <td><%= order.deliveryDetails.mobile %></td>
+            <td>₹<%= order.totalAmount %></td>
+
+            <td>
+              <span class="badge bg-info text-dark"><%= order.paymentMethod %></span>
+            </td>
+
+            <td id="status-<%= order._id %>">
+              <% if (order.status === "placed") { %>
+                <span class="badge bg-warning text-dark">Placed</span>
+              <% } else { %>
+                <span class="badge bg-success">Shipped</span>
+              <% } %>
+            </td>
+
+            <td id="ship-order-<%= order._id %>">
+              <% if (order.status === "placed") { %>
+                <button onclick="shipOrder('<%= order._id %>')" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-truck"></i> Ship
+                </button>
+              <% } else { %>
+                ✅
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<%- include("../partials/footer.ejs") %>

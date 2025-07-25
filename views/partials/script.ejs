@@ -1,0 +1,191 @@
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+    crossorigin="anonymous"
+></script>
+
+<script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    let table = new DataTable('#myTable');
+    function addToCart(proId, opn) {
+        $.ajax({
+            url: '/user/add-to-cart/' + proId,
+            method: 'get',
+            success: function(response) {
+                if (response.loginRequired) {
+                    window.location.href = "/user/signin"
+                }
+                else if (response.status) {
+                    let count = $("#cart-count").html();
+                    count = parseInt(count) + 1;
+                    $("#cart-count").html(count);
+                }
+            }
+        })
+    }
+    function decrementCount(proId, proQty, proPrice, button, removeCallback) {
+        $.ajax({
+            url: '/user/cart/decrement/' + proId,
+            method: 'get',
+            success: function (response) {
+                if (response.status) {
+                    let quantity = $("#proCount-"+proId).html();
+                    if (quantity === "1") {
+                        return removeCallback(proId, proPrice, proQty, button);
+                    } else {
+                        quantity = parseInt(quantity) - 1;
+                        $("#proCount-"+proId).html(quantity);
+                    }
+                    let count = $("#cart-count").html();
+                    count = parseInt(count) - 1;
+                    $("#cart-count").html(count);
+
+                    let total = $("#total").html();
+                    total = parseInt(total) - proPrice;
+                    $("#total").html(total);
+                }
+            }
+        })
+    }
+    function incrementCount(proId, proPrice) {
+        $.ajax({
+            url: '/user/cart/increment/' + proId,
+            method: 'get',
+            success: function (response) {
+                if (response.status) {
+                    let quantity = $("#proCount-"+proId).html();
+                    console.log(quantity);
+                    quantity = parseInt(quantity) + 1;
+                    $("#proCount-"+proId).html(quantity);
+
+                    let count = $("#cart-count").html();
+                    count = parseInt(count) + 1;
+                    $("#cart-count").html(count);
+
+                    let total = $("#total").html();
+                    total = parseInt(total) + parseInt(proPrice);
+                    $("#total").html(total);
+                }
+            }
+        })
+    }
+    function removeCartItem(proId, proPrice, proQty, button) {
+        fetch("/user/cart/remove-cart-item/" + proId)
+            .then((res) => {
+                res.json()
+                    .then((data) => {
+                        console.log(data);
+                        if (!data.cartEmpty) {
+                            alert(data.proname + " Removed from Cart");
+                            let cartCount = $("#cart-count").html();
+                            let proQuantity = $("#proCount-"+proId).html();
+                            cartCount = parseInt(cartCount) - parseInt(proQuantity);
+                            $("#cart-count").html(cartCount);
+                            let total = $("#total").html();
+                            console.log("total: "+total);
+                            console.log("product Price: "+proPrice);
+                            console.log("product quantity: "+proQuantity);
+                            total = parseInt(total) - parseInt(proPrice * parseInt(proQuantity));
+                            $("#total").html(total);
+                            const row = button.closest('tr');
+                            row.remove();
+                            
+                        } else {
+                            alert(data.proname + " Removed from Cart");
+                            window.location.href = "/";
+                        }
+                    })
+            });
+    }
+    $("#checkout-form").submit((e) => {
+        e.preventDefault();
+        $.ajax({
+            url: "/user/cart/place-order",
+            method: 'post',
+            data: $("#checkout-form").serialize(),
+            success: function (response) {
+                alert("order placed");
+                if ( response.codSuccess ) {
+                    window.location.href = "/user/cart/checkout";
+                } else {
+                    razorpayPayment(response);
+                }
+                
+            }
+        });
+    });
+
+    function razorpayPayment(order) {
+        // Open Razorpay Checkout
+      const options = {
+        key: 'rzp_test_67klMYKmGOMhj3', // Replace with your Razorpay key_id
+        amount: order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        currency: 'INR',
+        name: 'Shopify',
+        description: 'Test Transaction',
+        order_id: order.id, // This is the order_id created in the backend
+        method: {
+            upi: true,
+            card: true,
+            netbanking: true,
+            wallet: true,
+            paylater: true,
+        },
+        // callback_url: 'http://localhost:3000/payment-success', // Your success URL
+        handler: function(response) {
+
+            verifyPayment(response, order);
+        },
+        prefill: {
+          name: 'Gaurav Kumar',
+          email: 'gaurav.kumar@example.com',
+          contact: '9747658149'
+        },
+        theme: {
+          color: '#F37254'
+        },
+      };
+      function verifyPayment(payment, order) {
+        $.ajax({
+            url: "/user/verifyPayment",
+            data: {
+                payment,
+                order,
+            },
+            method: "post",
+            success: function(response) {
+                if (response.status) {
+                    window.location.href = "/user/cart/checkout";
+                } else {
+                    console.log(response.errMsg);
+                    alert(response.errMsg);
+                }
+            }
+        })
+      }
+      const rzp = new Razorpay(options);
+      rzp.open();
+    };
+
+    function shipOrder(orderId) {
+        console.log("shipping");
+        $.ajax({
+            url: "/admin/ship-order/" + orderId,
+            method: "get",
+            success: function(response) {
+                if (response.status) {
+                    console.log("yess");
+                    $("#status-"+orderId).html("shipped");
+                    $("#ship-order-"+orderId).html("✅");
+                }
+            }
+        })
+    };
+
+</script>

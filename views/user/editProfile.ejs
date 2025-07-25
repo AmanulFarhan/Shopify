@@ -1,0 +1,57 @@
+<%- include("../partials/head.ejs") %>
+
+<div class="container pt-4">
+    <h1 class="text-center">Edit Profile</h1>
+    <% if (locals.errors) { %>
+        
+        <% errors.forEach(error => { %>
+            <div class="alert alert-danger" role="alert">
+                <%= error.msg %>
+            </div>
+            
+        <% }) %>
+        
+    <% } %>
+    <form action="/user/edit-profile" method="post" enctype="multipart/form-data">
+        
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" name="name" value="<%= formData.name ? formData.name : (user ? user.fullName : '') %>" class="form-control" id="name">
+            
+        </div>
+        <div class="mb-3">
+            <label for="category" class="form-label">Email</label>
+            <input type="email" name="email" value="<%= formData.email ? formData.email : (user ? user.email : '') %>" class="form-control" id="email">
+            
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Mobile</label>
+            <input type="number" name="mobile" value="<%= formData.mobile ? formData.mobile : (user ? user.mobile : '') %>" class="form-control" id="mobile">
+            
+        </div>
+        <div class="mb-3">
+            <label for="price" class="form-label">Address</label>
+            <textarea type="text" name="address" class="form-control" id="address"><%= formData.address ? formData.address : (user ? user.address : '') %></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
+            <img src="<%=user.profileImageUrl !=='' ? user.profileImageUrl : '/images/avatar.png'%>" width="5%" height="5%" alt="" id="imgView" class="pb-2">
+            <input type="file" name="userImage" class="form-control" id="image" onchange="viewImage(event)">
+                <% if (locals.image) { %>
+                    <p>Previously Uploaded Image: <%= locals.image %></p>
+                <% } %>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+</div>
+
+<script>
+    function viewImage(event) {
+        const imageUrl = URL.createObjectURL(event.target.files[0]);
+        document.getElementById("imgView").src = imageUrl;
+    }
+</script>
+
+<%- include("../partials/footer.ejs") %>

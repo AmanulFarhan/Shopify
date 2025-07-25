@@ -1,0 +1,39 @@
+<%- include("../partials/head.ejs") %>
+
+<section class="py-4 bg-light min-vh-100">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+      <h3 class="fw-bold text-dark">Registered Users</h3>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive shadow-sm rounded bg-white p-3">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Profile</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach((user, index) => { %>
+          <tr>
+            <th scope="row"><%= index + 1 %></th>
+            <td class="fw-semibold"><%= user.fullName %></td>
+            <td><%= user.email %></td>
+            <td>
+              <img src="<%= user.profileImageUrl %>" width="50" height="50"
+                class="rounded-circle border border-secondary-subtle" alt="<%= user.fullName %>">
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<%- include("../partials/footer.ejs") %>
